@@ -1,25 +1,19 @@
-const pingCommand = require('./ping');
-const statusCommand = require('./status');
 const config = require('../config/config');
 
-// Lista todos os comandos disponíveis
-const allCommands = {
-  [pingCommand.command]: pingCommand,
-  [statusCommand.command]: statusCommand
-};
-
-// Gera a mensagem de ajuda dinamicamente
-function generateHelpMessage() {
-  let helpText = `${config.MESSAGES.HELP}\n\n`;
-  
-  for (const [name, cmd] of Object.entries(allCommands)) {
-    helpText += `${config.BOT_CONFIG.PREFIX}${name} - ${cmd.description}\n`;
+module.exports = {
+  command: 'ping',
+  description: 'Testa a resposta do bot',
+  execute: (ctx) => {
+    const startTime = Date.now();
+    
+    ctx.reply('🏓 Pong!').then(() => {
+      const latency = Date.now() - startTime;
+      ctx.reply(`⏱ Latência: ${latency}ms\n` +
+                `🤖 Bot: ${config.BOT_CONFIG.NAME}\n` +
+                `🛠 Versão: ${config.BOT_CONFIG.VERSION}`);
+    }).catch(error => {
+      console.error('Erro ao responder ping:', error);
+      ctx.reply(config.MESSAGES.ERROR);
+    });
   }
-  
-  return helpText;
-}
-
-// Atualiza a mensagem de ajuda no config
-config.MESSAGES.HELP = generateHelpMessage();
-
-module.exports = allCommands;
+};
