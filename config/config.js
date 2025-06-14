@@ -6,7 +6,7 @@ module.exports = {
     NAME: 'ZENTRIX',
     USERNAME: '@zentrix01_bot',
     LOG_CHANNEL: '-1001234567890',
-    WEBHOOK_URL: 'https://zentrix-3m7s.onrender.com' // ✅ define aqui direto
+    WEBHOOK_URL: 'https://zentrix-3m7s.onrender.com'
   },
 
   OWNER: {
