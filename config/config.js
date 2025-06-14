@@ -10,7 +10,7 @@ module.exports = {
   },
 
   OWNER: {
-    ID: '123456789',
+    ID: '6037121105',
     USERNAME: '@D4NIEL_EUGENIA',
     NAME: 'Daniel',
   },
