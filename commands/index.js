@@ -1,6 +1,7 @@
 const pingCommand = require('./ping');
 const statusCommand = require('./status');
 const config = require('../config/config');
+const baixar = require("./baixar");
 
 // Lista todos os comandos disponíveis
 const allCommands = {
