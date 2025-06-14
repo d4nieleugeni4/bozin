@@ -1,40 +1,22 @@
 const express = require('express');
+const config = require('./config/config');
 const TelegramService = require('./services/telegramService');
 const logger = require('./utils/logger');
-const config = require('./config/config');
 
-process.title = `${config.BOT_CONFIG.NAME}_Bot`;
+const app = express();
+const port = process.env.PORT || 10000;
 
-(async () => {
-  const app = express();
-  app.use(express.json());
+app.use(express.json());
 
-  const telegramService = new TelegramService();
+// Inicia o bot (isso registra o webhook internamente)
+const telegramService = new TelegramService();
 
-  app.post('/webhook', telegramService.getWebhookCallback());
+// Cria endpoint que o Telegram usará
+app.post(`/bot${config.BOT_CONFIG.TOKEN}`, (req, res) => {
+  telegramService.bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
 
-  app.get('/', (req, res) => res.send('✅ Bot online via webhook!'));
-
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, async () => {
-    logger.log(`Servidor rodando na porta ${PORT}`);
-
-    const webhookUrl = `${process.env.WEBHOOK_URL}/webhook`;
-    await telegramService.setWebhook(webhookUrl);
-    await telegramService.showStartupInfo();
-  });
-
-  process.on('SIGINT', () => {
-    logger.log('\nDesligando o bot...');
-    process.exit(0);
-  });
-
-  process.on('uncaughtException', (error) => {
-    logger.error(`Uncaught Exception: ${error.stack}`);
-    process.exit(1);
-  });
-
-  process.on('unhandledRejection', (reason, promise) => {
-    logger.error(`Unhandled Rejection at: ${promise}, reason: ${reason}`);
-  });
-})();
+app.listen(port, () => {
+  logger.log(`Servidor rodando na porta ${port}`);
+});
