@@ -2,7 +2,7 @@ module.exports = {
   BOT_CONFIG: {
     TOKEN: '8193776420:AAE0rHpcYxkicl57txUG6e1g1o23aGvMKq0',
     PREFIX: '/',
-    VERSION: '1.0.0',
+    VERSION: '1.0.2',
     NAME: 'ZENTRIX',
     USERNAME: '@zentrix01_bot',
     LOG_CHANNEL: '-1001234567890',
