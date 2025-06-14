@@ -11,8 +11,8 @@ module.exports = {
 
   OWNER: {
     ID: '123456789',
-    USERNAME: '@seu_username',
-    NAME: 'Seu Nome',
+    USERNAME: '@D4NIEL_EUGENIA',
+    NAME: 'Daniel',
   },
 
   OPTIONS: {
