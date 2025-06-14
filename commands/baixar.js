@@ -1,3 +1,4 @@
+
 const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
@@ -9,12 +10,12 @@ module.exports = {
   async handler(ctx) {
     const url = ctx.message.text.split(" ")[1];
     if (!url) {
-      return ctx.reply("Você precisa enviar a URL do YouTube. Ex: /baixar https://youtube.com/...");
+      return ctx.reply("❗ Você precisa enviar a URL do YouTube. Exemplo: /baixar https://youtube.com/...");
     }
 
     const outputPath = `video_${Date.now()}.mp4`;
 
-    ctx.reply("⏬ Baixando o vídeo, aguarde...");
+    await ctx.reply("⏬ Baixando o vídeo, aguarde...");
 
     exec(`./yt-dlp -o "${outputPath}" -f mp4 ${url}`, async (err, stdout, stderr) => {
       if (err) {
@@ -28,7 +29,7 @@ module.exports = {
         console.error("Erro ao enviar vídeo:", err);
         ctx.reply("❌ Erro ao enviar o vídeo para o Telegram.");
       } finally {
-        fs.unlinkSync(outputPath); // Limpa o vídeo após envio
+        fs.unlink(outputPath, () => {});
       }
     });
   },
