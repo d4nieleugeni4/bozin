@@ -9,13 +9,25 @@ module.exports = {
       return ctx.reply(config.MESSAGES.UNAUTHORIZED);
     }
 
-    const statusMessage = `🤖 ${config.BOT_CONFIG.NAME} Status:\n` +
-                         `Versão: ${config.BOT_CONFIG.VERSION}\n` +
-                         `Usuário: ${config.BOT_CONFIG.USERNAME}\n` +
-                         `Dono: ${config.OWNER.NAME} (${config.OWNER.USERNAME})\n` +
-                         `Ping: ${Date.now() - ctx.message.date * 1000}ms\n` +
-                         `Status: Operacional ✅`;
+    const startTime = Date.now();
     
-    ctx.reply(statusMessage);
+    ctx.reply('🔄 Verificando status...').then((sentMessage) => {
+      const latency = Date.now() - startTime;
+      const statusMessage = `🤖 ${config.BOT_CONFIG.NAME} Status:\n` +
+                           `Versão: ${config.BOT_CONFIG.VERSION}\n` +
+                           `Usuário: ${config.BOT_CONFIG.USERNAME}\n` +
+                           `Dono: ${config.OWNER.NAME} (${config.OWNER.USERNAME})\n` +
+                           `Ping: ${latency}ms\n` +
+                           `Status: Operacional ✅`;
+      
+      // Edita a mensagem anterior com o status completo
+      ctx.bot.editMessageText(statusMessage, {
+        chat_id: sentMessage.chat.id,
+        message_id: sentMessage.message_id
+      });
+    }).catch(error => {
+      console.error('Erro ao responder status:', error);
+      ctx.reply(config.MESSAGES.ERROR);
+    });
   }
 };
