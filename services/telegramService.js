@@ -5,30 +5,31 @@ const logger = require('../utils/logger');
 
 class TelegramService {
   constructor() {
-    this.bot = new Telegram(config.BOT_CONFIG.TOKEN, { polling: false });
+    this.bot = new Telegram(config.BOT_CONFIG.TOKEN, {
+      webHook: {
+        port: false
+      }
+    });
+
+    const webhookPath = `/bot${config.BOT_CONFIG.TOKEN}`;
+    const fullWebhookUrl = `${config.BOT_CONFIG.WEBHOOK_URL}${webhookPath}`;
+    this.bot.setWebHook(fullWebhookUrl);
+
     this.registerMiddlewares();
     this.registerCommands();
     this.registerEvents();
+    this.showStartupInfo();
   }
 
-  async setWebhook(webhookUrl) {
-    await this.bot.setWebHook(webhookUrl);
-    logger.success(`Webhook setado: ${webhookUrl}`);
-  }
-
-  getWebhookCallback() {
-    return (req, res) => {
-      this.bot.processUpdate(req.body);
-      res.sendStatus(200);
-    };
-  }
-
-  async showStartupInfo() {
-    const botInfo = await this.bot.getMe();
-    logger.startup(config.BOT_CONFIG.NAME, config.BOT_CONFIG.VERSION);
-    logger.log(`Bot iniciado como @${botInfo.username}`);
-    logger.log(`Dono: ${config.OWNER.NAME} (${config.OWNER.USERNAME})`);
-    logger.success(`Pronto para receber comandos! Prefixo: ${config.BOT_CONFIG.PREFIX}`);
+  showStartupInfo() {
+    this.bot.getMe().then((me) => {
+      logger.startup(config.BOT_CONFIG.NAME, config.BOT_CONFIG.VERSION);
+      logger.log(`Bot iniciado como @${me.username}`);
+      logger.log(`Dono: ${config.OWNER.NAME} (${config.OWNER.USERNAME})`);
+      logger.success(`Pronto para receber comandos! Prefixo: ${config.BOT_CONFIG.PREFIX}`);
+    }).catch(err => {
+      logger.error('Erro ao obter informações do bot:', err.message);
+    });
   }
 
   registerMiddlewares() {
@@ -42,7 +43,7 @@ class TelegramService {
 
   registerCommands() {
     for (const [commandName, command] of Object.entries(commands)) {
-      const regex = new RegExp(`^\\${config.BOT_CONFIG.PREFIX}${commandName}(?:@${config.BOT_CONFIG.USERNAME.replace('@', '')})?$`, 'i');
+      const regex = new RegExp(`^\\${config.BOT_CONFIG.PREFIX}${commandName}(?:@${config.BOT_CONFIG.USERNAME})?$`);
 
       this.bot.onText(regex, async (msg) => {
         const chatId = msg.chat.id;
@@ -83,16 +84,16 @@ class TelegramService {
       });
     });
 
-    this.bot.on('new_chat_members', (msg) => {
-      logger.log(`Novo membro no chat ${msg.chat.title}: ${msg.new_chat_members.map(u => u.username).join(', ')}`);
-    });
-
     this.bot.on('polling_error', (error) => {
       logger.error(`Polling error: ${error.message}`);
     });
 
     this.bot.on('webhook_error', (error) => {
       logger.error(`Webhook error: ${error.message}`);
+    });
+
+    this.bot.on('new_chat_members', (msg) => {
+      logger.log(`Novo membro no chat ${msg.chat.title}: ${msg.new_chat_members.map(u => u.username).join(', ')}`);
     });
   }
 }
