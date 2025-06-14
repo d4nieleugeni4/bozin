@@ -1,11 +1,13 @@
 const pingCommand = require('./ping');
 const statusCommand = require('./status');
+const profileCommand = require('./profile'); // Novo comando
 const config = require('../config/config');
 
 // Lista todos os comandos disponíveis
 const allCommands = {
   [pingCommand.command]: pingCommand,
-  [statusCommand.command]: statusCommand
+  [statusCommand.command]: statusCommand,
+  [profileCommand.command]: profileCommand // Adiciona o novo comando
 };
 
 // Gera a mensagem de ajuda dinamicamente
