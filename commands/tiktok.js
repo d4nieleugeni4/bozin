@@ -22,7 +22,7 @@ module.exports = {
 
       // Configuração da API
       const apiUrl = 'https://api.spiderv.com.br/api/downloads/tik-tok';
-      const apiKey = '1XvMBo8B0ZIfdQrkQ2co'; // Substitua por sua chave de API
+      const apiKey = 'IXvMBo8BOZIfdQrkQ2co'; // Substitua por sua chave de API
 
       // Faz a requisição para a API
       const response = await axios.get(`${apiUrl}?url=${encodeURIComponent(url)}&api_key=${apiKey}`);
