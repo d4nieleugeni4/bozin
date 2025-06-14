@@ -1,18 +1,35 @@
-import zipfile
-import os
+const { exec } = require("child_process");
+const fs = require("fs");
+const path = require("path");
 
-# Caminho do arquivo ZIP enviado
-zip_path = "/mnt/data/bozin-main.zip"
-extract_path = "/mnt/data/bozin-main"
+module.exports = {
+  command: "baixar",
+  description: "Baixa vídeo do YouTube",
 
-# Extrair o conteúdo do ZIP
-with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-    zip_ref.extractall(extract_path)
+  async handler(ctx) {
+    const url = ctx.message.text.split(" ")[1];
+    if (!url) {
+      return ctx.reply("Você precisa enviar a URL do YouTube. Ex: /baixar https://youtube.com/...");
+    }
 
-# Listar arquivos extraídos para entender a estrutura
-extracted_files = []
-for root, dirs, files in os.walk(extract_path):
-    for file in files:
-        extracted_files.append(os.path.join(root, file))
+    const outputPath = `video_${Date.now()}.mp4`;
 
-extracted_files
+    ctx.reply("⏬ Baixando o vídeo, aguarde...");
+
+    exec(`./yt-dlp -o "${outputPath}" -f mp4 ${url}`, async (err, stdout, stderr) => {
+      if (err) {
+        console.error("Erro ao baixar vídeo:", stderr);
+        return ctx.reply("❌ Erro ao baixar o vídeo.");
+      }
+
+      try {
+        await ctx.replyWithVideo({ source: fs.createReadStream(outputPath) });
+      } catch (err) {
+        console.error("Erro ao enviar vídeo:", err);
+        ctx.reply("❌ Erro ao enviar o vídeo para o Telegram.");
+      } finally {
+        fs.unlinkSync(outputPath); // Limpa o vídeo após envio
+      }
+    });
+  },
+};
